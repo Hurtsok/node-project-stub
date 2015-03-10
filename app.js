@@ -15,7 +15,16 @@ app.set('staticPath', '/static');
 app.use(router);
 
 app.use('/css', function(req, res, next){
-    var str = require('fs').readFileSync(__dirname + app.get('staticPath') + req.originalUrl, 'utf8');
+    var fs = require('fs'),
+        stylPath = req.originalUrl.replace(/(\d{1,}|\w{1,}|_{1,})\.css$/i, '$1' + '.styl'), data;
+
+    data = fs.readFileSync(__dirname + app.get('staticPath') + stylPath, { encoding: 'utf8' }, function(err, data){
+        if (err) throw err;
+    });
+    stylus(data).render(function(err, css){
+            if (err) throw err;
+            fs.writeFileSync(__dirname + app.get('staticPath') + req.originalUrl, css);
+    });
     next();
 })
 
