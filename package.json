@@ -3,6 +3,10 @@
     "version": "1.1.0",
     "author": "Hurtsok <hurtsok@gmail.com>",
     "description": "my simple nodejs project stub",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/Hurtsok/node-project-stub"
+    },
     "engines": {
         "node": ">=0.10"
     },
