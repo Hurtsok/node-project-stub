@@ -51,10 +51,10 @@ module.exports = function(config) {
             }],
 
             // bemtree
-            [techs.bemtree, { devMode: process.env.BEMTREE_ENV === 'development' }],
+            [techs.bemtree, { devMode: process.env.BEMTREE_ENV === 'development', sourceSuffixes: ['bemtree', 'bemtree.js'] }],
 
             // bemhtml
-            [techs.bemhtml, { devMode: process.env.BEMHTML_ENV === 'development' }],
+            [techs.bemhtml, { devMode: process.env.BEMHTML_ENV === 'development', sourceSuffixes: ['bemhtml', 'bemhtml.js'] }],
 
             [require('./techs/bemtreeToHtml')],
 
