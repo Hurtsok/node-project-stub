@@ -1,20 +1,32 @@
-match(function() {
-    return !this._root;
-})(function() {
-    return applyNext({
-        _root: true,
-        ctx: {
-            block: 'page',
-            title: 'TODO',
-            head: [
-                { elem: 'css', url: '_index.css' }
-            ],
-            scripts: [
-                { elem: 'js', url: '_index.js' }
-            ],
-            mods: {
-                theme: 'islands'
+block('root').def()(function() {
+    var ctx = this.ctx;
+
+    this.data = ctx.data; // пробрасываем поле data, чтобы оно было доступно во всех блоках
+    if (ctx.context) return applyCtx(ctx.context); // если был передан какой-либо `context`, то генерируем дерево, начиная с него
+
+    // если context не был передан, то генерируем страницу целиком
+    return applyCtx({
+        block: 'page',
+        title: ctx.data.title,
+        favicon: '/favicon.ico',
+        styles: [
+            {
+                elem: 'css',
+                url: this.data.dir + '/_index.css'
             }
+        ],
+        scripts: [
+            {
+                elem: 'js',
+                url: this.data.dir + '/_index.js'
+            }
+        ],
+        head: [
+            { elem : 'meta', attrs : { name : 'viewport', content : 'width=device-width, initial-scale=1' } },
+        ],
+        mods: {
+            theme: 'islands',
+            view: ctx.data.view
         }
     });
 });

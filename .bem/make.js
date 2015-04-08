@@ -13,12 +13,16 @@ var techs = {
         // js
         browserJs: require('enb-diverse-js/techs/browser-js'),
         prependYm: require('enb-modules/techs/prepend-modules'),
+        js: require('enb/techs/js'),
 
         // bemtree
         bemtree: require('enb-bemxjst/techs/bemtree-old'),
 
         // bemhtml
-        bemhtml: require('enb-bemxjst/techs/bemhtml-old')
+        bemhtml: require('enb-bemxjst/techs/bemhtml-old'),
+
+        //html
+        html: require('enb-bemxjst/techs/html-from-bemjson')
     },
     enbBemTechs = require('enb-bem-techs'),
     levels = [
@@ -28,11 +32,36 @@ var techs = {
         { path: 'bower_components/bem-components/desktop.blocks', check: false },
         { path: 'bower_components/bem-components/design/common.blocks', check: false },
         { path: 'bower_components/bem-components/design/desktop.blocks', check: false },
-        'common.blocks'
-    ];
+        'common.blocks',
+        'desktop.blocks'
+    ],
+    path = require('path'),
+    naming = require('bem-naming');
 
 module.exports = function(config) {
     var isProd = process.env.YENV === 'production';
+
+    config.includeConfig('enb-bem-examples');
+
+    var examples = config.module('enb-bem-examples').createConfigurator('examples');
+
+    examples.configure({
+        destPath: 'desktop.examples',
+        levels: ['desktop.blocks'],
+        inlineBemjson: true,
+        processInlineBemjson: function(bemjson, meta){
+            var basename = path.basename(meta.filename, '.bemjson.js');
+            return {
+                block: 'page',
+                attrs: { style: 'display: block' },
+                head: [
+                    { elem: 'js', url: '/desktop.examples/' +  naming.stringify(bemjson) + '/' + basename + '/' + basename + '.js' },
+                    { elem: 'css', url: '/desktop.examples/' + naming.stringify(bemjson) + '/' +  basename + '/' + basename + '.css' }
+                ],
+                content: bemjson
+            }
+        }
+    });
 
     config.nodes('*.bundles/*', function(nodeConfig) {
         nodeConfig.addTechs([
@@ -94,4 +123,36 @@ module.exports = function(config) {
 
         nodeConfig.addTargets(['?.bemtree.js', '?.html', '_?.css', '_?.js']);
     });
+
+    config.nodes('*.examples/*/*', function(nodeConfig){
+        nodeConfig.addTechs([
+            [enbBemTechs.levels, { levels: levels }],
+
+            [enbBemTechs.bemjsonToBemdecl],
+            [enbBemTechs.deps],
+            [enbBemTechs.files],
+            [techs.js, {sourceSuffixes: ['vanilla.js', 'browser.js', 'js'] }],
+
+            //html
+            [techs.html],
+
+            //bemhtml
+            [techs.bemhtml, { devMode: process.env.BEMHTML_ENV === 'development', sourceSuffixes: ['bemhtml', 'bemhtml.js'] }],
+
+            //css
+            [techs.cssStylus, { target: '?.noprefix.css' }],
+            [techs.cssAutoprefixer, {
+                sourceTarget: '?.noprefix.css',
+                destTarget: '?.css',
+                browserSupport: ['last 2 versions', 'ie 10', 'opera 12.16']
+            }],
+
+            // borschik
+            [techs.borschik, { sourceTarget: '?.js', destTarget: '_?.js', freeze: true, minify: isProd }],
+            [techs.borschik, { sourceTarget: '?.css', destTarget: '_?.css', tech: 'cleancss', freeze: true, minify: isProd }]
+        ]);
+
+        nodeConfig.addTargets(['_?.css', '_?.js', '?.html']);
+    })
+
 };

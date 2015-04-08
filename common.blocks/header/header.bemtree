@@ -1,9 +1,0 @@
-block('header').content()(function(){
-    return [
-        {
-            elem: 'test',
-            mods: { type: (this.ctx.data)? this.ctx.data : 'test' },
-        }
-
-    ]
-})

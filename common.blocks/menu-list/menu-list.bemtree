@@ -1,0 +1,18 @@
+block('menu-list').content()(function(){
+    var menu;
+
+
+    if(this.data.menu){
+        menu = this.data.menu.map(function(item){
+            var obj = {};
+            obj.elem = 'link';
+            obj.content = item.title;
+            obj.url = item.url;
+            obj.mods = { active: item.active };
+
+            return obj;
+        })
+
+        return menu;
+    }
+})

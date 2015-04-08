@@ -1,0 +1,17 @@
+block('content-wrapper').match(!this.ctx._wrapper)(function(){
+    var ctx = this.ctx;
+    ctx._wrapped = true;
+    return applyCtx({
+        block: ctx.block,
+        mix: { block: 'flex', mods: { type: 'content' } } ,
+        content: [
+            {
+                block: 'menu-list',
+                mods: { type: 'default' }
+            },
+            {
+                block: 'content'
+            }
+        ]
+    })
+})
